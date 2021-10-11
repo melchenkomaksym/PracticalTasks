@@ -1,0 +1,26 @@
+Create tables for storing metrics. Old data (v1) is stored in test_data table and new data (v2) - in test_data2 table.
+Structure of both tables is similar.
+
+create table test_data (version string, datetime string, hostname string, uuid string, metric double, metrics string)
+row format delimited
+fields terminated by '\t'
+lines terminated by '\n'
+stored as textfile;
+
+create table test_data2 (version string, datetime string, hostname string, uuid string, metric double, metrics string)
+row format delimited
+fields terminated by '\t'
+lines terminated by '\n'
+stored as textfile;
+
+In order to find rows that differ we should use the query:
+select t1.uuid, t1.hostname, t1.metric, t2.metric, t1.metrics, t2.metrics
+from (select uuid, hostname, metric, str_to_map(regexp_replace(regexp_replace(regexp_replace(regexp_replace(metrics, "\\{", ""),"\\}","")," ",""),"'",""),",",":") as metrics from test_data) t1
+join (select uuid, hostname, metric, str_to_map(regexp_replace(regexp_replace(regexp_replace(regexp_replace(metrics, "\\{", ""),"\\}","")," ",""),"'",""),",",":") as metrics from test_data2) t2
+on (t1.uuid=t2.uuid)
+where abs(t1.metric-t2.metric)*100/t1.metric > 10
+or abs(t1.metrics["m1"]-t2.metrics["m1"])*100/t1.metrics["m1"] > 10
+or abs(t1.metrics["m2"]-t2.metrics["m2"])*100/t1.metrics["m2"] > 10
+or abs(t1.metrics["m3"]-t2.metrics["m3"])*100/t1.metrics["m3"] > 10
+or abs(t1.metrics["m4"]-t2.metrics["m4"])*100/t1.metrics["m4"] > 10
+or abs(t1.metrics["m5"]-t2.metrics["m5"])*100/t1.metrics["m5"] > 10;
