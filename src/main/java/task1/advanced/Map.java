@@ -25,7 +25,7 @@ public class Map extends Mapper<LongWritable, Text, Text, Text> {
     private String replaceSynonyms(String text) {
         initSynonyms();
 
-        for (var synonymsEntry : synonyms.entrySet()) {
+        for (java.util.Map.Entry<String, String> synonymsEntry: synonyms.entrySet()) {
             text = text.replaceAll(String.format("\\b%s\\b", synonymsEntry.getKey()), synonymsEntry.getValue());
         }
 

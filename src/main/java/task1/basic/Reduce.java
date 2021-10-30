@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 
@@ -31,7 +32,7 @@ public class Reduce extends Reducer<Text, Text, Text, Text> {
             wordsWithCounts.put(word, count + 1);
         }
 
-        for (var entry : wordsWithCounts.entrySet()) {
+        for (Map.Entry<String, Integer> entry : wordsWithCounts.entrySet()) {
             if (queue.size() <= topWordsNumber || entry.getValue() > queue.peek().getCount()) {
                 queue.add(new Word(new Text(entry.getKey()), entry.getValue()));
             }
